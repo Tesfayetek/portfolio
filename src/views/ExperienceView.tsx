@@ -14,12 +14,22 @@ import {
 interface ExperienceViewProps {
   benchmarks: MetricBenchmark;
   initialTab?: 'experience' | 'education' | 'certifications';
+  experience?: ExperienceRecord[];
+  education?: EducationRecord[];
+  certifications?: CertificationRecord[];
 }
 
 export const ExperienceView: React.FC<ExperienceViewProps> = ({
   benchmarks,
   initialTab = 'experience',
+  experience,
+  education,
+  certifications,
 }) => {
+  const activeExperience = (experience || INITIAL_EXPERIENCE).filter((e) => e.published !== false);
+  const activeEducation = (education || INITIAL_EDUCATION).filter((e) => e.published !== false);
+  const activeCertifications = (certifications || INITIAL_CERTIFICATIONS).filter((c) => c.published !== false);
+
   const [selectedTrack, setSelectedTrack] = useState<'experience' | 'education' | 'certifications'>(
     initialTab
   );
@@ -41,7 +51,7 @@ export const ExperienceView: React.FC<ExperienceViewProps> = ({
   const toggleAllDeliverables = () => {
     const allExpanded = Object.values(expandedDeliverables).every(Boolean);
     const updated: Record<string, boolean> = {};
-    INITIAL_EXPERIENCE.forEach((item) => {
+    activeExperience.forEach((item) => {
       updated[item.id] = !allExpanded;
     });
     setExpandedDeliverables(updated);
@@ -161,7 +171,7 @@ export const ExperienceView: React.FC<ExperienceViewProps> = ({
               {/* Structural Timeline Rule */}
               <div className="absolute left-2.5 top-3 bottom-4 w-0.5 bg-surface-container-highest" />
 
-              {INITIAL_EXPERIENCE.map((item) => (
+              {activeExperience.map((item) => (
                 <article
                   key={item.id}
                   className="relative flex flex-col gap-space-sm"
@@ -211,33 +221,6 @@ export const ExperienceView: React.FC<ExperienceViewProps> = ({
                       {item.summary}
                     </p>
 
-                    {/* Quantitative Impact Metrics */}
-                    {item.scopeMetric && (
-                      <div className="grid grid-cols-2 gap-space-xs pt-1">
-                        <div className="p-2.5 rounded-lg bg-surface-container-low flex flex-col">
-                          <span className="font-label-sm text-label-sm text-slate-cool">
-                            Transformation Scope
-                          </span>
-                          <span className="font-headline-sm text-headline-sm text-primary font-bold mt-0.5">
-                            {item.scopeMetric}
-                          </span>
-                          <span className="font-label-sm text-label-sm text-secondary font-medium">
-                            {item.scopeLabel || 'Digital Blueprint'}
-                          </span>
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-surface-container-low flex flex-col">
-                          <span className="font-label-sm text-label-sm text-slate-cool">
-                            Platform Resiliency
-                          </span>
-                          <span className="font-headline-sm text-headline-sm text-primary font-bold mt-0.5">
-                            {item.resiliencyMetric}
-                          </span>
-                          <span className="font-label-sm text-label-sm text-secondary font-medium">
-                            {item.resiliencyLabel || 'System Uptime SLA'}
-                          </span>
-                        </div>
-                      </div>
-                    )}
 
                     {/* Deliverables toggle */}
                     {item.deliverables && item.deliverables.length > 0 && (
@@ -300,7 +283,7 @@ export const ExperienceView: React.FC<ExperienceViewProps> = ({
               </span>
             </div>
 
-            {INITIAL_EDUCATION.map((edu) => (
+            {activeEducation.map((edu) => (
               <div
                 key={edu.id}
                 className="p-space-md rounded-xl bg-surface-container-lowest shadow-xs border border-border-subtle/50 flex flex-col gap-space-sm"
@@ -326,7 +309,7 @@ export const ExperienceView: React.FC<ExperienceViewProps> = ({
                 </div>
                 <div className="p-3 rounded-lg bg-surface-container-low flex flex-col gap-1">
                   <span className="font-label-sm text-label-sm text-slate-cool font-medium">
-                    Core Executive Research Focus
+                    Academic & Technical Curriculum
                   </span>
                   <p className="font-body-sm text-body-sm text-on-surface">
                     {edu.researchFocus}
@@ -360,12 +343,12 @@ export const ExperienceView: React.FC<ExperienceViewProps> = ({
                 Professional Credentials
               </span>
               <span className="font-label-sm text-label-sm text-secondary font-bold">
-                {INITIAL_CERTIFICATIONS.length} Verified Active
+                {activeCertifications.length} Verified Active
               </span>
             </div>
 
             <div className="flex flex-col gap-space-sm">
-              {INITIAL_CERTIFICATIONS.map((cert) => (
+              {activeCertifications.map((cert) => (
                 <article
                   key={cert.id}
                   className="p-space-md rounded-xl bg-surface-container-lowest shadow-xs border border-border-subtle/50 flex flex-col gap-space-sm"

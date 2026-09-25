@@ -8,11 +8,10 @@ import {
   CertificationRecord,
   AwardRecord,
   AuditActivity,
+  LanguageItem,
 } from '../types';
 
 export const ASSETS = {
-  logo: 'https://lh3.googleusercontent.com/aida/AEtjO1U22tDXMr4FfLvZCuSJKF9XFffi9uwi7ySB0vSlh6jLEtC1RZ61Ira7-1Vbv4GRc3HHNCq9Xq5eLWTPdDwrrEBqxILjeeQ2ZGN99R3ITuESqPGpy7WopKP_q12pQaIubotWT7-PW6uFXBv0CwZGj4vm4v1FZ4F24gE_HQKO2hSqtQi6VuUvEDoWX8NHH1v8TOm2N_cHGZiKfbYm8WF-VQzL3LGy6xC-OUYiAT6_OWuR2qGgd7NO1RMFmVy8',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC83zoylQsEqr44w9DLYFx8yWQAeJRQGrlmnS6XeP9dwSGl6brtLv_Gt0HnOL6FTSTFuwFmC5kRCO1rZRRdJcltl7nADn4_DXIYeizHezrW4n3SssNi_AFkatOC6PEvPOGikTh3meTqwbzhWHqAWw1tk9JRO4ZriS1InnWuI0J_S_Adis4FM2j4Len62nx0JLDaGXgOPbBFdovu2v3jnZS_ou-pbJOeNrbh26XhkPwMwsIZre9hB1F7IQ',
   headerThumb: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCeXHzj_ZVkbTAvk7o6b1AZG0uvIs_AyNrrJMMaA41qzD2Hfv_Q9vqoj1dbQB8F5mRZl3x9GZxLT1VYFBtUVhmygxOXGoTwaYR7ANUR7AAN1pgwMzJKG4IcTirCNztmLq1KdVyZ1_yOsIpShpIUICjHAJ-1BUrSg4_cxalnGJx9pxfVa4OVTmsqo_Yh6XvHmNufjiX1aHykN-TT-K8E1FGcFOVQ-oQOH7JIcgnQAwxD0Kn_-gYsAtZa9A',
   adminPortrait: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAY9A8S6UvKFGj2oR_Ss2ouxueP8c6wMTki_96CfAIpKGPl6lxEv2ooOkHPyK6BgKh-Rpj-MdhMoz4v6VeMe6zensv0WO5XLRwMV6sZ4RUrnZvU6kqfJAxL06zhP_ue5suyNnoDfpa3qEMwLOgXtEbAO83E9KPO-6jIP8LEJAtjm6FaMQltllLMIw9kXFtnAq77fjN3nAp0DHGQ_-0Y6WLYGCzciCPfYCamncRZdkzx6dwb7bJReVl3Dg',
   caseStudyBanking: 'https://lh3.googleusercontent.com/aida-public/AB6AXuByr6i_MR-RTWNI65Rp-ZsUA9yIoFdS-M6-TUQGYrwS-6RXCmseqaeu8sCPzEyXVYYeXxGR0sdbAfJ_KaapO0i1LSDfc8qYAy3JY4HM64gwmcA1g1LJv9ocz58vN6c2W2ynqGY97CclhMXxnlmBxgqwqPZvyPc50l2CV08HZe6q7htl6REeBm7tnSvfPtK_ermEYVqG0SY3v-xb0rtmf6nz6luqxFS7omCQeAKd-rAjAxrQZZWvDbrPmg',
@@ -37,133 +36,167 @@ export const INITIAL_PROFILE: ProfileData = {
 };
 
 export const INITIAL_BENCHMARKS: MetricBenchmark = {
-  years: '12+',
-  certifications: '18+',
-  projects: '45+',
+  years: '10+',
+  certifications: '6',
+  projects: '4+',
   pillars: '5',
   governedValue: 'Enterprise'
 };
 
+export const INITIAL_LANGUAGES: LanguageItem[] = [
+  {
+    language: 'Amharic',
+    proficiency: 'Native',
+    flagCode: 'ET'
+  },
+  {
+    language: 'English',
+    proficiency: 'Proficient',
+    flagCode: 'EN'
+  }
+];
+
 export const SKILL_DOMAINS: SkillDomain[] = [
   {
-    id: 'tech',
-    title: 'Technology & Architecture',
+    id: 'database',
+    title: 'Database Management',
     icon: 'dns',
-    tierBadge: 'Tier 1',
+    tierBadge: 'Core Discipline',
     tierClass: 'bg-primary/10 text-primary',
     skills: [
-      { name: 'Cloud Computing', level: 'Expert' },
-      { name: 'Distributed Systems', level: 'Expert' },
-      { name: 'Microservices', level: 'Expert' },
-      { name: 'Enterprise Security', level: 'Advanced' },
-      { name: 'High-Throughput APIs', level: 'Expert' }
+      { name: 'Oracle', level: 'Expert' },
+      { name: 'MySQL', level: 'Expert' }
     ]
   },
   {
-    id: 'mgmt',
-    title: 'Executive Management',
-    icon: 'groups_3',
-    tierBadge: 'Leadership',
+    id: 'networking',
+    title: 'Networking',
+    icon: 'hub',
+    tierBadge: 'Infrastructure',
     tierClass: 'bg-secondary/10 text-secondary',
     skills: [
-      { name: 'Agile / Scaled Scrum', level: 'Expert' },
-      { name: 'Cross-Functional Leadership', level: 'Expert' },
-      { name: 'Vendor & Partner Strategy', level: 'Advanced' },
-      { name: 'Capital & Resource Allocation', level: 'Expert' }
+      { name: 'Cisco Networking', level: 'Expert' },
+      { name: 'Network Security', level: 'Advanced' }
     ]
   },
   {
-    id: 'biz',
-    title: 'Business & Transformation',
-    icon: 'vital_signs',
-    tierBadge: 'Strategic',
+    id: 'web',
+    title: 'Web Development',
+    icon: 'code',
+    tierBadge: 'Full Stack',
     tierClass: 'bg-[#D97706]/10 text-[#D97706]',
     skills: [
-      { name: 'Enterprise ERP & CRM', level: 'Expert' },
-      { name: 'Data Strategy & Governance', level: 'Expert' },
-      { name: 'Process Automation (RPA)', level: 'Advanced' },
-      { name: 'ROI & TCO Financial Modeling', level: 'Expert' }
+      { name: 'HTML', level: 'Expert' },
+      { name: 'CSS', level: 'Expert' },
+      { name: 'JavaScript', level: 'Expert' },
+      { name: 'ASP.NET', level: 'Expert' }
+    ]
+  },
+  {
+    id: 'os',
+    title: 'Operating Systems',
+    icon: 'computer',
+    tierBadge: 'Systems Administration',
+    tierClass: 'bg-primary/10 text-primary',
+    skills: [
+      { name: 'Windows Server', level: 'Expert' },
+      { name: 'Linux', level: 'Advanced' }
     ]
   },
   {
     id: 'tools',
-    title: 'Tooling & Infrastructure',
-    icon: 'terminal',
-    tierBadge: 'Production',
+    title: 'Tools & Utilities',
+    icon: 'construction',
+    tierBadge: 'Production Stack',
     tierClass: 'bg-surface-container-high text-on-surface-variant',
     skills: [
-      { name: 'Kubernetes', level: 'Expert' },
-      { name: 'AWS Cloud', level: 'Expert' },
-      { name: 'Microsoft Azure', level: 'Advanced' },
-      { name: 'Python', level: 'Expert' },
-      { name: 'Node.js', level: 'Expert' },
-      { name: 'React Ecosystem', level: 'Advanced' },
-      { name: 'Docker', level: 'Expert' },
-      { name: 'Terraform (IaC)', level: 'Expert' }
+      { name: 'VMware', level: 'Expert' },
+      { name: 'cPanel', level: 'Expert' },
+      { name: 'Git', level: 'Advanced' }
     ]
   }
 ];
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    id: 'case_banking',
-    title: 'Next-Gen Enterprise Banking Core Migration',
-    role: 'Role: Lead Architect',
-    year: '2023',
-    domain: 'Financial Technology & Cloud',
-    summary: 'Architected and spearheaded the zero-downtime decoupled transition of a high-volume legacy mainframe banking ledger into a resilient, event-driven distributed ecosystem processing $1.8B+ daily transaction volume.',
+    id: 'case_yerora',
+    title: 'Yerora.com',
+    role: 'Lead Web Architect & Developer',
+    year: 'E-Commerce Platform',
+    domain: 'Online Retail',
+    summary: 'Designed and developed a robust e-commerce platform with product catalogs, shopping cart flow, secure checkout, and performant backend data integration.',
     detailedImpact: [
-      'Eliminated single-point-of-failure bottlenecks across 34 downstream payment clearing rails.',
-      'Constructed idempotent Apache Kafka distributed partitions guaranteeing exactly-once transactional semantics.',
-      'Achieved continuous ISO27001 and PCI-DSS Level 1 regulatory compliance sign-off with external auditors.'
+      'Designed and developed an intuitive, responsive e-commerce storefront for mobile and desktop shoppers.',
+      'Configured cPanel deployment, MySQL database normalization, and secure checkout workflows.',
+      'Implemented automated inventory management and order notification systems.'
     ],
-    techTags: ['Cloud Architecture', 'Microservices', 'Apache Kafka', 'AWS'],
+    techTags: ['E-Commerce', 'Web Development', 'HTML/CSS/JS', 'MySQL', 'cPanel'],
     kpiHighlight: {
-      icon: 'speed',
-      text: '99.999% SLA Uptime',
+      icon: 'shopping_bag',
+      text: 'Robust E-Commerce',
       colorClass: 'text-primary'
-    },
-    image: ASSETS.caseStudyBanking
-  },
-  {
-    id: 'case_omnichannel',
-    title: 'Omnichannel Digital Transformation Platform',
-    role: 'Role: Technical Director',
-    year: '2022',
-    domain: 'Omnichannel Ecosystem',
-    summary: 'Unified five disparate customer engagement platforms across mobile, web, and physical branch terminals into a singular reactive interface layer with automated continuous integration pipeline.',
-    detailedImpact: [
-      'Consolidated fragmented user session data into a unified GraphQL federated gateway.',
-      'Reduced average customer onboarding latency from 14 minutes down to 90 seconds.',
-      'Delivered synchronized multi-channel cart state with sub-50ms websocket synchronization.'
-    ],
-    techTags: ['React', 'Node.js', 'AWS', 'CI/CD Automation'],
-    kpiHighlight: {
-      icon: 'trending_up',
-      text: '+42% Customer NPS',
-      colorClass: 'text-[#D97706]'
     },
     image: ASSETS.caseStudyOmnichannel
   },
   {
-    id: 'case_data',
-    title: 'AI-Powered BI & Automated Reporting',
-    role: 'Role: Strategic Lead',
-    year: '2021',
-    domain: 'Data Intelligence',
-    summary: 'Conceived and deployed an institutional centralized data lake with intelligent natural-language query models and automated real-time KPI synthesis for executive leadership committees.',
+    id: 'case_urrpo',
+    title: 'Urrpo.gov.et',
+    role: 'Web & Systems Administrator',
+    year: 'Official Portal',
+    domain: 'Government & Public Sector',
+    summary: 'Managed website development and ongoing maintenance for the Urban Revenue Reform Project Office, ensuring high availability, network security, and prompt public announcements.',
     detailedImpact: [
-      'Automated weekly C-suite briefing pack generation with verified audit trails.',
-      'Connected 42 distinct enterprise data silos across ERP, CRM, and telemetry clusters.',
-      'Democratized SQL-free ad-hoc querying for 180+ business analysts globally.'
+      'Managed end-to-end portal development, ongoing maintenance, and routine software updates.',
+      'Enforced network security controls, SSL certificate management, and web server stability.',
+      'Coordinated with organizational teams to publish revenue reform documentation and citizen notices.'
     ],
-    techTags: ['Python', 'Data Lake', 'PowerBI', 'Predictive ML'],
+    techTags: ['Government Portal', 'Web Management', 'Network Security', 'Windows Server'],
     kpiHighlight: {
-      icon: 'schedule',
-      text: '140 hrs/mo Saved',
+      icon: 'account_balance',
+      text: 'Official Portal',
       colorClass: 'text-secondary'
     },
+    image: ASSETS.caseStudyBanking
+  },
+  {
+    id: 'case_ethiopiab2b',
+    title: 'Ethiopiab2b.com',
+    role: 'Full-Stack Developer',
+    year: 'Online Delivery Platform',
+    domain: 'B2B & Retail Apparel',
+    summary: 'Created a comprehensive online delivery clothing store facilitating B2B apparel transactions with structured product categories, supplier inquiries, and fulfillment tracking.',
+    detailedImpact: [
+      'Created an end-to-end online clothing store and delivery platform tailored for B2B transactions.',
+      'Developed dynamic product catalogs with ASP.NET, JavaScript, and database integration.',
+      'Streamlined customer order processing, catalog categorization, and delivery coordination.'
+    ],
+    techTags: ['ASP.NET', 'Online Delivery Store', 'B2B Commerce', 'JavaScript', 'Database'],
+    kpiHighlight: {
+      icon: 'local_shipping',
+      text: 'Online Delivery Store',
+      colorClass: 'text-[#D97706]'
+    },
     image: ASSETS.caseStudyData
+  },
+  {
+    id: 'case_cadastral_qa',
+    title: 'Cadastral & Real Property Registration System',
+    role: 'QA Specialist & DBA',
+    year: 'National System',
+    domain: 'Software Testing & QA',
+    summary: 'Conducted rigorous testing and quality assurance for a cadastral and real property registration system, ensuring data integrity, business logic compliance, and Oracle database stability.',
+    detailedImpact: [
+      'Executed thorough test plans, regression testing, and verification for national property titles.',
+      'Validated Oracle database schema constraints, stored procedure executions, and rollback safety.',
+      'Identified and documented software issues, coordinating with engineering teams for quality sign-off.'
+    ],
+    techTags: ['Software Testing', 'Quality Assurance', 'Oracle Database', 'Cadastral System', 'Data Integrity'],
+    kpiHighlight: {
+      icon: 'verified',
+      text: 'Verified SQA',
+      colorClass: 'text-primary'
+    },
+    image: ASSETS.caseStudyBanking
   }
 ];
 
@@ -267,77 +300,90 @@ export const INITIAL_EDUCATION: EducationRecord[] = [
     id: 'edu_01',
     degree: 'B.Sc.',
     field: 'Information Technology',
-    institution: 'Accredited University Faculty of Technology',
+    institution: 'Addis Ababa University, Addis Ababa',
     honors: 'Conferred with Distinction',
-    researchFocus: 'Comprehensive study and practical projects in database management systems, network infrastructure, software engineering, and enterprise systems security.'
+    researchFocus: 'Comprehensive curriculum and hands-on projects in database management systems, network engineering, web application development, operating systems, and systems security.'
   }
 ];
 
 export const INITIAL_CERTIFICATIONS: CertificationRecord[] = [
   {
-    id: 'cert_oracle_dba',
-    title: 'Oracle Database Administrator Certified',
+    id: 'cert_oracle_11g',
+    title: 'Oracle 11g: DBA Administration Workshop I',
     issuer: 'Oracle Corporation',
-    level: 'Associate & Professional Level',
-    period: 'Active • Certified',
-    credentialId: 'ORA-DBA-9412',
+    level: 'Database Administration & Architecture',
+    period: 'Certified',
+    credentialId: 'ORA-11G-DBA-01',
     status: 'Active',
     verifyUrl: 'https://education.oracle.com',
     icon: 'dns'
   },
   {
     id: 'cert_cisco_ccna',
-    title: 'Cisco Certified Network Associate (CCNA)',
+    title: 'Cisco CCNA Routing and Switching',
     issuer: 'Cisco Systems',
     level: 'Routing & Switching / Enterprise Network Infrastructure',
-    period: 'Active • Valid',
-    credentialId: 'CSCO-129481',
+    period: 'Certified',
+    credentialId: 'CSCO-CCNA-RS-02',
     status: 'Active',
-    verifyUrl: 'https://www.cisco.com/c/en/us/training-events/career-certifications.html',
+    verifyUrl: 'https://www.cisco.com',
     icon: 'hub'
   },
   {
     id: 'cert_ms_server',
-    title: 'Microsoft Certified: Systems & Cloud Administration',
+    title: 'Microsoft Windows Server 2012 R2 (Installing, Configuring, and Administering)',
     issuer: 'Microsoft Corporation',
-    level: 'Windows Server & Azure Fundamentals',
-    period: 'Active • Certified',
-    credentialId: 'MS-891043',
+    level: 'Server Infrastructure & Active Directory Administration',
+    period: 'Certified',
+    credentialId: 'MS-WS2012-R2-03',
     status: 'Active',
-    verifyUrl: 'https://learn.microsoft.com/en-us/credentials/',
-    icon: 'cloud'
+    verifyUrl: 'https://learn.microsoft.com',
+    icon: 'computer'
   },
   {
-    id: 'cert_itil_found',
-    title: 'ITIL® 4 Foundation in IT Service Management',
-    issuer: 'AXELOS Global / PeopleCert',
-    level: 'ITSM & Operational Incident Governance',
-    period: 'Lifetime Accreditation',
-    credentialId: 'ITIL-4-8841',
+    id: 'cert_asp_net',
+    title: 'Web Application Development Using ASP.NET',
+    issuer: 'Professional Development Program',
+    level: 'Web Application & Backend Engineering',
+    period: 'Certified',
+    credentialId: 'ASPNET-DEV-04',
     status: 'Certified',
-    verifyUrl: 'https://www.axelos.com',
-    icon: 'assignment_turned_in'
+    verifyUrl: 'https://learn.microsoft.com',
+    icon: 'code'
+  },
+  {
+    id: 'cert_sqa',
+    title: 'Software Testing and Quality Assurance',
+    issuer: 'Professional Software Quality Certification',
+    level: 'System Testing, Verification & Quality Assurance',
+    period: 'Certified',
+    credentialId: 'SQA-TEST-05',
+    status: 'Certified',
+    verifyUrl: '#',
+    icon: 'verified'
+  },
+  {
+    id: 'cert_appreciation',
+    title: 'Certificate of Appreciation',
+    issuer: 'Ethiopian Fruit and Vegetable Market S.C.',
+    level: 'Recognition for IT Infrastructure & Operational Excellence',
+    period: 'Honored',
+    credentialId: 'EFVMSC-REC-06',
+    status: 'Certified',
+    verifyUrl: '#',
+    icon: 'military_tech'
   }
 ];
 
 export const AWARDS: AwardRecord[] = [
   {
     id: 'award_1',
-    title: 'Excellence in Enterprise Innovation Award',
-    conferrer: 'Global Tech Forum',
-    year: '2023',
-    description: 'Conferred for pioneering architectural resilience in enterprise financial systems migration.',
+    title: 'Certificate of Appreciation',
+    conferrer: 'Ethiopian Fruit and Vegetable Market S.C.',
+    year: '2017',
+    description: 'Conferred in recognition of dedication, spearheading IT infrastructure projects, providing technical support, and maintaining secure data management.',
     icon: 'military_tech',
     colorClass: 'text-[#D97706]'
-  },
-  {
-    id: 'award_2',
-    title: 'Top 40 Digital Leaders Under 40',
-    conferrer: 'Leadership Council',
-    year: '2022',
-    description: 'Recognized for transformative team leadership and enterprise-wide strategic execution.',
-    icon: 'workspace_premium',
-    colorClass: 'text-secondary'
   }
 ];
 

@@ -1,24 +1,37 @@
 import React, { useState } from 'react';
-import { CaseStudy, SkillDomain } from '../types';
-import { SKILL_DOMAINS, CASE_STUDIES, AWARDS } from '../data/portfolioData';
+import { CaseStudy, SkillDomain, AwardRecord, LanguageItem } from '../types';
+import { SKILL_DOMAINS, CASE_STUDIES, AWARDS, INITIAL_LANGUAGES } from '../data/portfolioData';
 
 interface SkillsViewProps {
   onSelectCaseStudy: (caseStudy: CaseStudy) => void;
   onOpenContact: () => void;
   onDownloadCv: () => void;
+  skillDomains?: SkillDomain[];
+  caseStudies?: CaseStudy[];
+  awards?: AwardRecord[];
+  languages?: LanguageItem[];
 }
 
 export const SkillsView: React.FC<SkillsViewProps> = ({
   onSelectCaseStudy,
   onOpenContact,
   onDownloadCv,
+  skillDomains,
+  caseStudies,
+  awards,
+  languages,
 }) => {
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'tech' | 'mgmt' | 'biz' | 'tools'>('all');
+  const activeDomains = (skillDomains || SKILL_DOMAINS).filter((d) => d.published !== false);
+  const activeCaseStudies = (caseStudies || CASE_STUDIES).filter((c) => c.published !== false);
+  const activeAwards = (awards || AWARDS).filter((a) => a.published !== false);
+  const activeLanguages = (languages || INITIAL_LANGUAGES).filter((l) => l.published !== false);
+
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
 
   const filteredDomains: SkillDomain[] =
     selectedFilter === 'all'
-      ? SKILL_DOMAINS
-      : SKILL_DOMAINS.filter((d) => d.id === selectedFilter);
+      ? activeDomains
+      : activeDomains.filter((d) => d.id === selectedFilter);
 
   return (
     <div className="flex flex-col w-full pb-10 animate-in fade-in duration-300">
@@ -31,11 +44,11 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary w-fit mb-2">
                 <span className="material-symbols-outlined text-[14px]">verified</span>
                 <span className="font-label-sm text-label-sm uppercase tracking-wider font-semibold">
-                  Strategic Dossier
+                  Technical Dossier
                 </span>
               </div>
               <h2 className="font-headline-xl-mobile text-headline-xl-mobile text-primary tracking-tight font-bold">
-                Skills Matrix & Key Case Studies
+                Technical Skills & Projects
               </h2>
             </div>
             <div className="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-md">
@@ -43,7 +56,7 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
             </div>
           </div>
           <p className="font-body-md text-body-md text-slate-cool mt-3 relative z-10">
-            Calibrated technical mastery across enterprise distributed backbones, large-scale organizational modernization, and high-impact fintech modernization.
+            Core capabilities spanning database administration, Cisco networking and network security, full-stack web engineering, operating systems, and production utilities.
           </p>
 
           {/* Competence Legend / Indicator Micro-Bar */}
@@ -51,18 +64,18 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-primary" />
               <span className="font-label-sm text-label-sm text-on-surface font-semibold">
-                Expert Cadre
+                Expert
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-secondary" />
               <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">
-                Advanced Leadership
+                Advanced
               </span>
             </div>
             <div className="ml-auto text-slate-cool flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">info</span>
-              <span className="font-label-sm text-label-sm">Audited 2024</span>
+              <span className="material-symbols-outlined text-[16px]">verified</span>
+              <span className="font-label-sm text-label-sm">5 Core Practice Areas</span>
             </div>
           </div>
         </div>
@@ -73,20 +86,21 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
             <div className="flex items-center gap-2">
               <div className="w-2 h-5 rounded-full bg-primary" />
               <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
-                Competency Matrix
+                Technical Skills
               </h3>
             </div>
-            <span className="font-label-sm text-label-sm text-slate-cool">4 Core Domains</span>
+            <span className="font-label-sm text-label-sm text-slate-cool">5 Domains</span>
           </div>
 
-          {/* Category Filter Pills (Interactive Micro UX) */}
+          {/* Category Filter Pills */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar py-0.5" id="skill-filter-bar">
             {[
               { id: 'all', label: 'All Domains' },
-              { id: 'tech', label: 'Technology' },
-              { id: 'mgmt', label: 'Management' },
-              { id: 'biz', label: 'Business Strategy' },
-              { id: 'tools', label: 'Tools & Stack' },
+              { id: 'database', label: 'Database' },
+              { id: 'networking', label: 'Networking' },
+              { id: 'web', label: 'Web Development' },
+              { id: 'os', label: 'Operating Systems' },
+              { id: 'tools', label: 'Tools' },
             ].map((tab) => {
               const isActive = selectedFilter === tab.id;
               return (
@@ -187,49 +201,72 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
             <div className="flex items-center gap-2">
               <div className="w-2 h-5 rounded-full bg-secondary" />
               <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
-                Featured Case Studies
+                Projects
               </h3>
             </div>
             <span className="font-label-sm text-label-sm text-slate-cool font-medium">
-              3 Flagship Milestones
+              {activeCaseStudies.length} Flagship Projects
             </span>
           </div>
 
           {/* Project Cards */}
           <div className="space-y-space-md">
-            {CASE_STUDIES.map((project) => (
-              <div
-                key={project.id}
-                className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-xs border border-border-subtle/50 flex flex-col group hover:shadow-md transition-shadow"
-              >
-                <div className="relative h-44 w-full bg-surface-container overflow-hidden">
-                  <img
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    src={project.image}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/35 to-transparent" />
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur text-primary font-label-sm text-label-sm font-bold shadow-xs">
-                      {project.role}
-                    </span>
-                  </div>
-                  <div className="absolute top-3 right-3">
-                    <span className="px-2.5 py-1 rounded-md bg-primary text-on-primary font-label-sm text-label-sm font-semibold">
-                      {project.year}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <span className="font-label-sm text-label-sm tracking-wide text-primary-fixed uppercase font-semibold">
-                      {project.domain}
-                    </span>
-                    <h4 className="font-headline-sm text-headline-sm text-white font-bold leading-tight drop-shadow-xs mt-0.5">
-                      {project.title}
-                    </h4>
-                  </div>
-                </div>
+            {activeCaseStudies.map((project) => {
+              const hasImage = Boolean(project.image && project.image.trim().length > 0);
+              return (
+                <div
+                  key={project.id}
+                  className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-xs border border-border-subtle/50 flex flex-col group hover:shadow-md transition-shadow"
+                >
+                  {hasImage ? (
+                    <div className="relative h-44 w-full bg-surface-container overflow-hidden">
+                      <img
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        src={project.image}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/35 to-transparent" />
+                      <div className="absolute top-3 left-3 flex gap-2">
+                        <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur text-primary font-label-sm text-label-sm font-bold shadow-xs">
+                          {project.role}
+                        </span>
+                      </div>
+                      <div className="absolute top-3 right-3">
+                        <span className="px-2.5 py-1 rounded-md bg-primary text-on-primary font-label-sm text-label-sm font-semibold">
+                          {project.year}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-3 left-3 right-3 text-white">
+                        <span className="font-label-sm text-label-sm tracking-wide text-primary-fixed uppercase font-semibold">
+                          {project.domain}
+                        </span>
+                        <h4 className="font-headline-sm text-headline-sm text-white font-bold leading-tight drop-shadow-xs mt-0.5">
+                          {project.title}
+                        </h4>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-space-md pb-0 flex flex-col gap-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2.5 py-1 rounded-md bg-primary/10 text-primary font-label-sm text-label-sm font-bold">
+                          {project.role}
+                        </span>
+                        <span className="px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-semibold">
+                          {project.year}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-label-sm text-label-sm tracking-wide text-secondary uppercase font-semibold">
+                          {project.domain}
+                        </span>
+                        <h4 className="font-headline-sm text-headline-sm text-primary font-bold leading-tight mt-0.5">
+                          {project.title}
+                        </h4>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="p-space-md flex flex-col gap-3">
+                  <div className="p-space-md flex flex-col gap-3">
                   <p className="font-body-sm text-body-sm text-slate-cool">
                     {project.summary}
                   </p>
@@ -268,6 +305,47 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
                   </div>
                 </div>
               </div>
+            );
+          })}
+          </div>
+        </div>
+
+        {/* Section: Languages */}
+        <div className="flex flex-col gap-space-sm pt-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-5 rounded-full bg-secondary" />
+              <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
+                Languages
+              </h3>
+            </div>
+            <span className="font-label-sm text-label-sm text-slate-cool font-medium">
+              Communication
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {activeLanguages.map((item) => (
+              <div
+                key={item.language}
+                className="bg-surface-container-lowest p-space-md rounded-xl shadow-xs border border-border-subtle/50 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined text-[22px]">
+                      translate
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-label-sm text-label-sm text-slate-cool uppercase font-medium">Language</span>
+                    <span className="font-headline-sm text-headline-sm text-primary font-bold text-base">
+                      {item.language}
+                    </span>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-semibold">
+                  {item.proficiency}
+                </span>
+              </div>
             ))}
           </div>
         </div>
@@ -284,7 +362,7 @@ export const SkillsView: React.FC<SkillsViewProps> = ({
             <span className="font-label-sm text-label-sm text-slate-cool">Peer Endorsed</span>
           </div>
           <div className="grid grid-cols-1 gap-3">
-            {AWARDS.map((award) => (
+            {activeAwards.map((award) => (
               <div
                 key={award.id}
                 className="bg-surface-container-lowest p-space-md rounded-xl shadow-xs border border-border-subtle/50 flex items-start gap-3.5"

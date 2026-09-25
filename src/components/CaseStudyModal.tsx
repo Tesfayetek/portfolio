@@ -20,39 +20,68 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
 
       <div className="relative z-10 w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-border-subtle max-h-[90vh] flex flex-col">
         {/* Hero banner */}
-        <div className="relative h-48 w-full bg-surface-container flex-shrink-0">
-          <img
-            src={caseStudy.image}
-            alt={caseStudy.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/40 to-transparent" />
-          
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
+        {caseStudy.image && caseStudy.image.trim().length > 0 ? (
+          <div className="relative h-48 w-full bg-surface-container flex-shrink-0">
+            <img
+              src={caseStudy.image}
+              alt={caseStudy.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/40 to-transparent" />
+            
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
 
-          <div className="absolute top-3 left-3 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur text-primary font-label-sm text-label-sm font-bold shadow-xs">
-              {caseStudy.role}
-            </span>
-            <span className="px-2 py-1 rounded-md bg-primary text-on-primary font-label-sm text-label-sm font-semibold">
-              {caseStudy.year}
-            </span>
-          </div>
+            <div className="absolute top-3 left-3 flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur text-primary font-label-sm text-label-sm font-bold shadow-xs">
+                {caseStudy.role}
+              </span>
+              <span className="px-2 py-1 rounded-md bg-primary text-on-primary font-label-sm text-label-sm font-semibold">
+                {caseStudy.year}
+              </span>
+            </div>
 
-          <div className="absolute bottom-3 left-4 right-4 text-white">
-            <span className="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider font-semibold">
-              {caseStudy.domain}
-            </span>
-            <h3 className="font-headline-sm text-headline-sm text-white font-bold leading-tight drop-shadow-xs mt-0.5">
-              {caseStudy.title}
-            </h3>
+            <div className="absolute bottom-3 left-4 right-4 text-white">
+              <span className="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider font-semibold">
+                {caseStudy.domain}
+              </span>
+              <h3 className="font-headline-sm text-headline-sm text-white font-bold leading-tight drop-shadow-xs mt-0.5">
+                {caseStudy.title}
+              </h3>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="p-space-lg pb-space-sm border-b border-border-subtle flex-shrink-0 bg-surface-container-lowest">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-md bg-primary/10 text-primary font-label-sm text-label-sm font-bold">
+                  {caseStudy.role}
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-semibold">
+                  {caseStudy.year}
+                </span>
+              </div>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full bg-surface-container text-slate-cool hover:text-primary flex items-center justify-center hover:bg-surface-container-high transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+            <div>
+              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                {caseStudy.domain}
+              </span>
+              <h3 className="font-headline-sm text-headline-sm text-primary font-bold leading-tight mt-0.5">
+                {caseStudy.title}
+              </h3>
+            </div>
+          </div>
+        )}
 
         {/* Content body */}
         <div className="p-space-lg overflow-y-auto no-scrollbar space-y-space-md flex-1">

@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavTab, ProfileData } from '../types';
-import { ASSETS } from '../data/portfolioData';
 
 interface ExecutiveDrawerProps {
   isOpen: boolean;
@@ -8,10 +7,12 @@ interface ExecutiveDrawerProps {
   activeTab: NavTab;
   setActiveTab: (tab: NavTab) => void;
   isAdmin: boolean;
-  setIsAdmin: (admin: boolean) => void;
+  onLogout: () => void;
+  onOpenAdminLogin: () => void;
   profile: ProfileData;
-  onDownloadCv: () => void;
+  onDownloadCv: (format?: 'pdf' | 'docx') => void;
   onOpenContact: () => void;
+  logoUrl?: string;
 }
 
 export const ExecutiveDrawer: React.FC<ExecutiveDrawerProps> = ({
@@ -20,15 +21,33 @@ export const ExecutiveDrawer: React.FC<ExecutiveDrawerProps> = ({
   activeTab,
   setActiveTab,
   isAdmin,
-  setIsAdmin,
+  onLogout,
+  onOpenAdminLogin,
   profile,
   onDownloadCv,
-  onOpenContact
+  onOpenContact,
+  logoUrl,
 }) => {
   if (!isOpen) return null;
 
+  const cleanLogoUrl = (logoUrl || '').trim();
+
   const navigateTo = (tab: NavTab) => {
     setActiveTab(tab);
+    onClose();
+  };
+
+  const handleAdminClick = () => {
+    if (isAdmin) {
+      navigateTo('admin');
+    } else {
+      onOpenAdminLogin();
+      onClose();
+    }
+  };
+
+  const handleLogoutClick = () => {
+    onLogout();
     onClose();
   };
 
@@ -43,7 +62,13 @@ export const ExecutiveDrawer: React.FC<ExecutiveDrawerProps> = ({
         {/* Top header */}
         <div className="flex items-center justify-between pb-space-sm border-b border-border-subtle mb-space-md">
           <div className="flex items-center gap-space-sm">
-            <img src={ASSETS.logo} alt="TT Logo" className="h-8 w-auto object-contain" />
+            {cleanLogoUrl ? (
+              <img src={cleanLogoUrl} alt="TT Logo" className="h-8 w-auto object-contain" />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary font-bold text-xs tracking-wider border border-secondary/20">
+                TT
+              </div>
+            )}
             <div>
               <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
                 Executive Control
@@ -61,42 +86,58 @@ export const ExecutiveDrawer: React.FC<ExecutiveDrawerProps> = ({
           </button>
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="bg-surface-container-low p-space-sm rounded-xl mb-space-md">
+        {/* Access Status & Authentication State */}
+        <div className="bg-surface-container-low p-space-sm rounded-xl mb-space-md border border-border-subtle/50">
           <div className="flex items-center justify-between mb-2">
             <span className="font-label-sm text-label-sm text-slate-cool uppercase font-semibold">
-              Interface Mode
+              Access State
             </span>
-            <span className="font-label-sm text-label-sm font-semibold text-secondary">
-              {isAdmin ? 'Console CMS Mode' : 'Public Executive View'}
+            <span className="font-label-sm text-label-sm font-semibold text-secondary flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+              {isAdmin ? 'Authenticated Administrator' : 'Public Visitor View'}
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-2 bg-surface-container-high p-1 rounded-lg">
-            <button
-              onClick={() => setIsAdmin(false)}
-              className={`py-2 rounded-md font-label-sm text-label-sm font-semibold transition-all ${
-                !isAdmin
-                  ? 'bg-primary text-on-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Public Dossier
-            </button>
-            <button
-              onClick={() => {
-                setIsAdmin(true);
-                setActiveTab('admin');
-                onClose();
-              }}
-              className={`py-2 rounded-md font-label-sm text-label-sm font-semibold transition-all ${
-                isAdmin
-                  ? 'bg-primary text-on-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Admin CMS
-            </button>
-          </div>
+
+          {isAdmin ? (
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="text-xs text-on-surface-variant flex items-center justify-between">
+                <span>Account:</span>
+                <span className="font-medium text-primary">contactesfaye@gmail.com</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleAdminClick}
+                  className="py-2 px-3 rounded-lg font-label-sm text-label-sm font-semibold bg-primary text-on-primary hover:bg-secondary transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                >
+                  <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+                  <span>Dashboard</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogoutClick}
+                  className="py-2 px-3 rounded-lg font-label-sm text-label-sm font-semibold bg-surface-container hover:bg-error/10 text-slate-cool hover:text-error transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-border-subtle"
+                >
+                  <span className="material-symbols-outlined text-[16px]">logout</span>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-xs text-slate-cool">
+                Management features require administrator authentication.
+              </span>
+              <button
+                type="button"
+                onClick={handleAdminClick}
+                className="py-1.5 px-3 rounded-lg font-label-sm text-label-sm font-semibold bg-primary text-on-primary hover:bg-secondary transition-colors cursor-pointer flex items-center gap-1 shadow-xs flex-shrink-0"
+              >
+                <span className="material-symbols-outlined text-[15px]">lock</span>
+                <span>Admin Login</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Direct Section Navigation */}
@@ -109,13 +150,22 @@ export const ExecutiveDrawer: React.FC<ExecutiveDrawerProps> = ({
               { id: 'home', label: 'Overview & Executive Profile', icon: 'dashboard' },
               { id: 'experience', label: 'Tenure, Education & Credentials', icon: 'workspace_premium' },
               { id: 'skills', label: 'Competency Matrix & Case Studies', icon: 'psychology' },
-              { id: 'projects', label: 'AI Intelligence & Cover Letter', icon: 'rocket_launch' },
-              { id: 'admin', label: 'Career Portal CMS & Telemetry', icon: 'admin_panel_settings' },
+              { id: 'projects', label: 'Executive Letter & Projects', icon: 'rocket_launch' },
+              ...(isAdmin
+                ? [{ id: 'admin', label: 'Career Portal CMS & Telemetry', icon: 'admin_panel_settings' }]
+                : [{ id: 'login', label: 'Administrator Portal Login', icon: 'lock' }]),
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => navigateTo(tab.id as NavTab)}
-                className={`flex items-center justify-between p-2.5 rounded-lg transition-colors text-left ${
+                onClick={() => {
+                  if (tab.id === 'login') {
+                    onOpenAdminLogin();
+                    onClose();
+                  } else {
+                    navigateTo(tab.id as NavTab);
+                  }
+                }}
+                className={`flex items-center justify-between p-2.5 rounded-lg transition-colors text-left cursor-pointer ${
                   activeTab === tab.id
                     ? 'bg-primary/10 text-primary font-semibold'
                     : 'bg-surface-container-low hover:bg-surface-container text-on-surface'
@@ -136,37 +186,49 @@ export const ExecutiveDrawer: React.FC<ExecutiveDrawerProps> = ({
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-2 mb-space-md">
-          <button
-            onClick={() => {
-              onDownloadCv();
-              onClose();
-            }}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-surface-container text-primary font-label-sm text-label-sm font-semibold hover:bg-surface-container-high transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px] text-secondary">
-              download
-            </span>
-            <span>Download CV</span>
-          </button>
-          <button
-            onClick={() => {
-              onOpenContact();
-              onClose();
-            }}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-semibold hover:bg-secondary transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px]">
-              mail
-            </span>
-            <span>Direct Inquiry</span>
-          </button>
+        <div className="pt-space-sm border-t border-border-subtle flex flex-col gap-2">
+          <span className="font-label-sm text-label-sm text-slate-cool uppercase font-semibold">
+            Executive Actions
+          </span>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => {
+                onDownloadCv('pdf');
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-surface-container text-primary font-label-sm text-label-sm font-semibold flex items-center justify-center gap-1 hover:bg-surface-container-high transition-colors cursor-pointer text-xs"
+              title="Download Resume as PDF"
+            >
+              <span className="material-symbols-outlined text-[16px] text-red-500">picture_as_pdf</span>
+              <span>CV (.pdf)</span>
+            </button>
+            <button
+              onClick={() => {
+                onDownloadCv('docx');
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-surface-container text-primary font-label-sm text-label-sm font-semibold flex items-center justify-center gap-1 hover:bg-surface-container-high transition-colors cursor-pointer text-xs"
+              title="Download Resume as Word (.docx)"
+            >
+              <span className="material-symbols-outlined text-[16px] text-blue-600">article</span>
+              <span>CV (.docx)</span>
+            </button>
+            <button
+              onClick={() => {
+                onOpenContact();
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold flex items-center justify-center gap-1 hover:bg-secondary transition-colors cursor-pointer text-xs"
+            >
+              <span className="material-symbols-outlined text-[16px]">mail</span>
+              <span>Inquiry</span>
+            </button>
+          </div>
         </div>
 
-        {/* Contact Info Footer */}
-        <div className="pt-space-sm border-t border-border-subtle flex items-center justify-between text-slate-cool font-label-sm text-label-sm">
-          <span>{profile.location}</span>
-          <span className="text-secondary font-mono">v4.8 Verified</span>
+        {/* Footer info */}
+        <div className="mt-space-md pt-space-sm border-t border-border-subtle/50 text-center text-xs text-slate-cool">
+          <span>{profile.fullName} • System Support Application Officer & DBA</span>
         </div>
       </div>
     </div>

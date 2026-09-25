@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { NavTab, ProfileData, CaseStudy } from './types';
-import { INITIAL_PROFILE, INITIAL_BENCHMARKS } from './data/portfolioData';
+import React, { useState, useEffect } from 'react';
+import { NavTab, CaseStudy, PortfolioContentState } from './types';
+import { contentService } from './services/contentService';
+import { downloadResumeDocx, downloadResumePdf } from './utils/resumeExport';
+import { authService } from './services/authService';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { ContactModal } from './components/ContactModal';
@@ -16,17 +18,27 @@ import { ExperienceView } from './views/ExperienceView';
 import { SkillsView } from './views/SkillsView';
 import { ProjectsView } from './views/ProjectsView';
 import { AdminView } from './views/AdminView';
+import { AdminLoginView } from './views/AdminLoginView';
 
 export default function App() {
+  // Public portfolio is the default landing page (Requirement 1)
   const [activeTab, setActiveTab] = useState<NavTab>('home');
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [profile, setProfile] = useState<ProfileData>(INITIAL_PROFILE);
-  const [benchmarks] = useState(INITIAL_BENCHMARKS);
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => authService.isAuthenticated());
+  const [publishedContent, setPublishedContent] = useState<PortfolioContentState>(() =>
+    contentService.getPublishedContent()
+  );
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<CaseStudy | null>(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [experienceTrack, setExperienceTrack] = useState<'experience' | 'education' | 'certifications'>('experience');
+
+  useEffect(() => {
+    const unsub = contentService.subscribe((_updated) => {
+      setPublishedContent(contentService.getPublishedContent());
+    });
+    return unsub;
+  }, []);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -35,60 +47,36 @@ export default function App() {
     }, 3500);
   };
 
-  const handleDownloadCv = () => {
-    showToast('Generating official CV (PDF)...');
-    const element = document.createElement('a');
-    const content = `TESFAYE TEKLU FEYISSA - CURRICULUM VITAE\n` +
-      `Role: System Support Application Officer | IT Systems | Database Administration | Web Development\n` +
-      `Phone: ${profile.phone} | Email: ${profile.email}\n` +
-      `Website: ${profile.website} | Location: ${profile.location}\n\n` +
-      `PROFESSIONAL SUMMARY:\n${profile.bio1}\n\n` +
-      `CORE COMPETENCIES:\n${profile.bio2}\n\n` +
-      `PROFESSIONAL EXPERIENCE:\n\n` +
-      `1. System Support Application Officer\n` +
-      `   Ethiopian Reinsurance S.C. (July 2025 – Present)\n` +
-      `   • Provide day-to-day technical and functional support for business applications.\n` +
-      `   • Create, modify, disable, and manage application user accounts.\n` +
-      `   • Manage user roles and permissions according to approved access requirements.\n` +
-      `   • Receive and analyze application-related incidents.\n` +
-      `   • Identify root causes of recurring problems.\n\n` +
-      `2. Network and Hardware Administrator\n` +
-      `   Urban Revenue Reform Project Office (July 2018 – July 2025)\n` +
-      `   • Oversee IT systems and network operations to ensure optimal performance.\n` +
-      `   • Implement and maintain hardware and software solutions to support organizational goals.\n` +
-      `   • Collaborate with teams to troubleshoot and resolve technical issues efficiently.\n\n` +
-      `3. Database Administrator\n` +
-      `   Federal Urban Land and Land-Related Property Registry and Information Agency (July 2017 – June 2018)\n` +
-      `   • Managed Oracle database systems critical to national land management.\n` +
-      `   • Ensured data security, integrity, and reliability.\n` +
-      `   • Optimized database performance and implemented backup and recovery strategies.\n\n` +
-      `4. IT Expert\n` +
-      `   Ethiopian Fruit and Vegetable Market S.C. (July 2014 – July 2017)\n` +
-      `   • Spearheaded IT infrastructure projects to enhance operational efficiency.\n` +
-      `   • Provided technical support and training to staff.\n` +
-      `   • Maintained IT systems and ensured secure data management.\n\n` +
-      `5. Database Administrator\n` +
-      `   Radiation Protection Authority (August 2013 – July 2014)\n` +
-      `   • Designed and managed Oracle databases to support organizational activities.\n` +
-      `   • Implemented database security measures to protect sensitive information.\n` +
-      `   • Developed reports to support decision-making processes.\n\n` +
-      `EDUCATION:\n` +
-      `- B.Sc. in Information Technology\n\n` +
-      `CERTIFICATIONS:\n` +
-      `- Oracle Database Administrator Certified (OCA / OCP)\n` +
-      `- Cisco Certified Network Associate (CCNA)\n` +
-      `- Microsoft Certified: Systems & Cloud Administration\n` +
-      `- ITIL® 4 Foundation in IT Service Management\n`;
+  const handleLoginSuccess = () => {
+    setIsAdmin(true);
+    setActiveTab('admin');
+    showToast('Administrator authenticated successfully');
+  };
 
-    const file = new Blob([content], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = 'Tesfaye_Teklu_Feyissa_CV.txt';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    setTimeout(() => {
-      showToast('CV downloaded successfully');
-    }, 1000);
+  const handleLogout = () => {
+    authService.logout();
+    setIsAdmin(false);
+    setActiveTab('home');
+    showToast('Logged out of administrative session');
+  };
+
+  // Only DOCX and PDF formats are generated (No .txt format anywhere)
+  const handleDownloadCv = async (format: 'pdf' | 'docx' = 'pdf') => {
+    try {
+      const currentPublished = contentService.getPublishedContent();
+      if (format === 'docx') {
+        showToast('Generating Word resume (.docx)...');
+        await downloadResumeDocx(currentPublished);
+        showToast('Word resume (.docx) generated successfully');
+      } else {
+        showToast('Generating PDF resume (.pdf)...');
+        await downloadResumePdf(currentPublished);
+        showToast('PDF resume (.pdf) generated successfully');
+      }
+    } catch (err) {
+      console.error('Failed to export resume:', err);
+      showToast('Error exporting resume. Please try again.');
+    }
   };
 
   const handleNavigateToCredentials = () => {
@@ -98,67 +86,114 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
-      {/* Top Fixed Header */}
+      {/* Top Fixed Header with Unobtrusive Admin Control */}
       <Header
         activeTab={activeTab}
+        fullName={publishedContent.profile.fullName}
         isAdmin={isAdmin}
+        logoUrl={publishedContent.mediaAssets?.logo}
+        onLogout={handleLogout}
+        onOpenAdminLogin={() => setActiveTab('login')}
         onOpenDrawer={() => setIsDrawerOpen(true)}
         setActiveTab={setActiveTab}
-        setIsAdmin={setIsAdmin}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-2xl mx-auto pt-16 pb-20 flex flex-col">
+      <main className="flex-1 w-full max-w-5xl mx-auto pt-16 pb-20 flex flex-col">
         {activeTab === 'home' && (
           <HomeView
-            benchmarks={benchmarks}
+            benchmarks={publishedContent.benchmarks}
+            isAdmin={isAdmin}
+            mediaAssets={publishedContent.mediaAssets}
             onDownloadCv={handleDownloadCv}
             onNavigateToCredentials={handleNavigateToCredentials}
+            onOpenAdminLogin={() => setActiveTab('login')}
             onOpenContact={() => setIsContactOpen(true)}
-            profile={profile}
+            onToast={showToast}
+            profile={publishedContent.profile}
             setActiveTab={setActiveTab}
+            siteSettings={publishedContent.siteSettings}
+            skillDomains={publishedContent.skillDomains}
+            heroTechnologyIcons={publishedContent.heroTechnologyIcons}
             toastMessage={toastMessage}
           />
         )}
 
         {activeTab === 'experience' && (
           <ExperienceView
-            benchmarks={benchmarks}
+            benchmarks={publishedContent.benchmarks}
+            certifications={publishedContent.certifications}
+            education={publishedContent.education}
+            experience={publishedContent.experience}
             initialTab={experienceTrack}
           />
         )}
 
         {activeTab === 'skills' && (
           <SkillsView
+            awards={publishedContent.awards}
+            caseStudies={publishedContent.caseStudies}
+            languages={publishedContent.languages}
             onDownloadCv={handleDownloadCv}
             onOpenContact={() => setIsContactOpen(true)}
             onSelectCaseStudy={(caseStudy) => setSelectedCaseStudy(caseStudy)}
+            skillDomains={publishedContent.skillDomains}
           />
         )}
 
         {activeTab === 'projects' && (
           <ProjectsView
             onOpenContact={() => setIsContactOpen(true)}
-            profile={profile}
+            profile={publishedContent.profile}
           />
         )}
 
+        {/* Dedicated Admin Login Route */}
+        {activeTab === 'login' && (
+          isAdmin ? (
+            <AdminView
+              onLogout={handleLogout}
+              onUpdateProfile={(_updated) => {
+                setPublishedContent(contentService.getPublishedContent());
+              }}
+              profile={publishedContent.profile}
+              setActiveTab={setActiveTab}
+            />
+          ) : (
+            <AdminLoginView
+              logoUrl={publishedContent.mediaAssets?.logo}
+              onLoginSuccess={handleLoginSuccess}
+              onNavigate={setActiveTab}
+            />
+          )
+        )}
+
+        {/* Protected Admin Route: Redirects unauthenticated visitors to Admin Login */}
         {activeTab === 'admin' && (
-          <AdminView
-            onUpdateProfile={(updated) => setProfile(updated)}
-            profile={profile}
-            setActiveTab={setActiveTab}
-          />
+          isAdmin ? (
+            <AdminView
+              onLogout={handleLogout}
+              onUpdateProfile={(_updated) => {
+                setPublishedContent(contentService.getPublishedContent());
+              }}
+              profile={publishedContent.profile}
+              setActiveTab={setActiveTab}
+            />
+          ) : (
+            <AdminLoginView
+              logoUrl={publishedContent.mediaAssets?.logo}
+              onLoginSuccess={handleLoginSuccess}
+              onNavigate={setActiveTab}
+            />
+          )
         )}
       </main>
 
-      {/* Fixed Bottom Navigation */}
+      {/* Fixed Bottom Navigation (Includes Admin only if authenticated) */}
       <BottomNav
         activeTab={activeTab}
+        isAdmin={isAdmin}
         setActiveTab={(tab) => {
-          if (tab === 'admin') {
-            setIsAdmin(true);
-          }
           if (tab === 'experience') {
             setExperienceTrack('experience');
           }
@@ -170,22 +205,21 @@ export default function App() {
       <ContactModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
-        profile={profile}
+        profile={publishedContent.profile}
       />
 
       <ExecutiveDrawer
         activeTab={activeTab}
         isAdmin={isAdmin}
         isOpen={isDrawerOpen}
+        logoUrl={publishedContent.mediaAssets?.logo}
         onClose={() => setIsDrawerOpen(false)}
         onDownloadCv={handleDownloadCv}
+        onLogout={handleLogout}
+        onOpenAdminLogin={() => setActiveTab('login')}
         onOpenContact={() => setIsContactOpen(true)}
-        profile={profile}
-        setActiveTab={(tab) => {
-          if (tab === 'admin') setIsAdmin(true);
-          setActiveTab(tab);
-        }}
-        setIsAdmin={setIsAdmin}
+        profile={publishedContent.profile}
+        setActiveTab={setActiveTab}
       />
 
       <CaseStudyModal

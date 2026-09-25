@@ -208,3 +208,50 @@
 .space-y-space-sm > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
 .space-y-space-md > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
 .space-y-space-lg > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+
+/* Slow, elegant orbital swing and glow animations for tech skill icons */
+@keyframes orbital-swing-float {
+  0%, 100% {
+    transform: translate(-50%, -50%) translate(0px, 0px) scale(1);
+  }
+  25% {
+    transform: translate(-50%, -50%) translate(5px, -6px) scale(1.02);
+  }
+  50% {
+    transform: translate(-50%, -50%) translate(-2px, 6px) scale(0.98);
+  }
+  75% {
+    transform: translate(-50%, -50%) translate(-6px, -2px) scale(1.02);
+  }
+}
+
+@keyframes orbital-pulse-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.03);
+  }
+}
+
+.animate-orbital-swing {
+  animation: orbital-swing-float 16s ease-in-out infinite;
+}
+
+.animate-orbital-glow {
+  animation: orbital-pulse-glow 9s ease-in-out infinite;
+}
+
+/* Accessibility: Respect system preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-orbital-swing,
+  .animate-orbital-glow,
+  .orbital-animated {
+    animation: none !important;
+    transform: translate(-50%, -50%) !important;
+    transition: none !important;
+  }
+}
+

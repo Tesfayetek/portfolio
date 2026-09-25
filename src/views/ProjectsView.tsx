@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { ProfileData, TargetJobParams } from '../types';
+import {
+  downloadExecutiveLetterDocx,
+  downloadExecutiveLetterPdf,
+} from '../utils/executiveLetterExport';
 
 interface ProjectsViewProps {
   profile: ProfileData;
@@ -19,6 +23,10 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedSuccess, setGeneratedSuccess] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(true);
+  const [isDownloadingDocx, setIsDownloadingDocx] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [historySaved, setHistorySaved] = useState(false);
   const [recentApps, setRecentApps] = useState([
     {
@@ -34,6 +42,12 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
       timeAgo: 'Synthesized 5d ago',
     },
   ]);
+
+  const currentDateStr = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   const toneOptions = [
     'Boardroom Executive',
@@ -53,6 +67,8 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
   const handleGenerate = async () => {
     setIsGenerating(true);
     setGeneratedSuccess(false);
+    setHasGenerated(true);
+    setDownloadError(null);
 
     // Call server endpoint or deterministic high-velocity synthesis
     try {
@@ -70,8 +86,8 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
       setTimeout(() => {
         setIsGenerating(false);
         setGeneratedSuccess(true);
-        setTimeout(() => setGeneratedSuccess(false), 3000);
-      }, 1000);
+        setTimeout(() => setGeneratedSuccess(false), 3500);
+      }, 900);
     }
   };
 
@@ -89,15 +105,30 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
     setTimeout(() => setHistorySaved(false), 2500);
   };
 
-  const handleDownload = (format: 'PDF' | 'DOCX') => {
-    const element = document.createElement('a');
-    const fileContent = `TESFAYE TEKLU\nChief Technology Officer • Technical Architect\n\nApplication for ${params.role} at ${params.organization}\n\nDear ${params.hiringAuthority},\n\nI am writing to express my focused interest in leading technology strategy as your next ${params.role} at ${params.organization}.\n\nWith over 12 years of executive experience across distributed systems and multi-region cloud architectures, I align engineering rigor with institutional business goals.\n\nSincerely,\nTesfaye Teklu\nExecutive Technical Director • Fellow, BCS`;
-    const file = new Blob([fileContent], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = `Tesfaye_Teklu_Cover_Letter_${params.organization.replace(/\s+/g, '_')}.${format === 'PDF' ? 'txt' : 'doc'}`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  const handleDownloadDocx = async () => {
+    try {
+      setIsDownloadingDocx(true);
+      setDownloadError(null);
+      await downloadExecutiveLetterDocx(params, profile, currentDateStr);
+    } catch (err) {
+      console.error('Failed to export Word document:', err);
+      setDownloadError('Failed to generate Word (.docx) document. Please try again.');
+    } finally {
+      setIsDownloadingDocx(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloadingPdf(true);
+      setDownloadError(null);
+      await downloadExecutiveLetterPdf(params, profile, currentDateStr);
+    } catch (err) {
+      console.error('Failed to export PDF document:', err);
+      setDownloadError('Failed to generate PDF (.pdf) document. Please try again.');
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   };
 
   return (
@@ -346,10 +377,10 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
                   TESFAYE TEKLU
                 </span>
                 <span className="font-label-sm text-label-sm text-accent-bronze uppercase tracking-widest font-semibold">
-                  Chief Technology Officer • Technical Architect
+                  System Support Application Officer | IT Systems | Database Administration
                 </span>
                 <span className="font-label-sm text-label-sm text-slate-cool mt-1">
-                  London, United Kingdom • Global Mobility
+                  Addis Ababa, Ethiopia • +251-932083373
                 </span>
               </div>
               <div className="text-right flex flex-col items-end text-xs">
@@ -361,7 +392,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
 
             <div className="flex flex-col gap-1 font-body-sm text-body-sm text-on-surface-variant">
               <span className="font-label-md text-label-md text-on-surface font-semibold" id="preview-date">
-                October 24, 2024
+                {currentDateStr}
               </span>
               <span className="font-semibold text-on-surface" id="preview-committee">
                 {params.hiringAuthority}
@@ -398,6 +429,13 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
                 </ul>
               </div>
 
+              {params.roleDescription && (
+                <div className="p-space-sm rounded-lg bg-surface-container border border-border-subtle/50 text-xs text-on-surface-variant">
+                  <span className="font-semibold text-primary">Mandate Alignment: </span>
+                  <span>{params.roleDescription}</span>
+                </div>
+              )}
+
               <p id="preview-body">
                 {params.organization}'s requirement for dependable systems and operational continuity aligns directly with my hands-on background. Across high-stakes environments—from national registry systems to reinsurance platforms—I have enforced strict access permissions, resolved complex technical issues, and collaborated cross-functionally to achieve organizational objectives.
               </p>
@@ -423,8 +461,8 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
           </div>
         </div>
 
-        {/* Action Dock */}
-        <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-lg border border-border-subtle/60 flex flex-col gap-space-sm">
+        {/* Action Dock & Clean Export Section */}
+        <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-lg border border-border-subtle/60 flex flex-col gap-space-md">
           <div className="grid grid-cols-2 gap-space-sm">
             <button
               className="col-span-2 bg-primary text-on-primary py-3 rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all hover:bg-secondary cursor-pointer"
@@ -473,28 +511,65 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ profile }) => {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-space-sm pt-1">
-            <button
-              className="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm flex items-center justify-center gap-1.5 active:bg-surface-container transition-colors cursor-pointer hover:bg-surface-container"
-              onClick={() => handleDownload('PDF')}
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[16px] text-error">
-                picture_as_pdf
-              </span>
-              <span>Download PDF</span>
-            </button>
-            <button
-              className="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm flex items-center justify-center gap-1.5 active:bg-surface-container transition-colors cursor-pointer hover:bg-surface-container"
-              onClick={() => handleDownload('DOCX')}
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[16px] text-secondary">
-                description
-              </span>
-              <span>Download DOCX</span>
-            </button>
-          </div>
+          {/* Clean Export Area */}
+          {hasGenerated && (
+            <div className="pt-space-xs border-t border-border-subtle/50 flex flex-col gap-space-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[20px]">
+                    verified
+                  </span>
+                  <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
+                    Executive Letter Generated Successfully
+                  </h3>
+                </div>
+              </div>
+
+              {downloadError && (
+                <div className="p-2.5 rounded-lg bg-red-50 text-red-700 border border-red-200 text-body-sm flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">error</span>
+                  <span>{downloadError}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-2">
+                <span className="font-label-md text-label-md text-slate-cool font-semibold">
+                  Download Executive Letter
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+                  <button
+                    className="w-full bg-primary text-on-primary py-3 px-4 rounded-lg font-label-md text-label-md font-semibold flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all hover:bg-secondary cursor-pointer disabled:opacity-50"
+                    id="download-word-btn"
+                    onClick={handleDownloadDocx}
+                    disabled={isDownloadingDocx}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[20px] text-accent-bronze">
+                      description
+                    </span>
+                    <span>
+                      {isDownloadingDocx ? 'Generating Word...' : 'Download Word (.docx)'}
+                    </span>
+                  </button>
+
+                  <button
+                    className="w-full bg-surface-container-high text-primary border border-border-subtle py-3 px-4 rounded-lg font-label-md text-label-md font-semibold flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all hover:bg-surface-container-highest cursor-pointer disabled:opacity-50"
+                    id="download-pdf-btn"
+                    onClick={handleDownloadPdf}
+                    disabled={isDownloadingPdf}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[20px] text-error">
+                      picture_as_pdf
+                    </span>
+                    <span>
+                      {isDownloadingPdf ? 'Generating PDF...' : 'Download PDF (.pdf)'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Recent Executive Applications */}
